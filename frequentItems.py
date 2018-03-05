@@ -71,7 +71,7 @@ class heavyHitter(object):
                             #print("aaaaa: ", type(hashtags), hashtags)
                             for ht in hashtags:               # multiple hashtags if possible
                                 #print("xxxxx: ", type(ht), ht['text'])
-                                yield str(ht)          # ht['text'][:15]
+                                yield str(ht['text'])          # ht['text'][:15]
                                 self.m += 1
                        
                        
@@ -95,6 +95,10 @@ class heavyHitter(object):
         elif len(self.topkLst) < k-1:  # > k- ;     m/k  not m >=k
             if element not in self.topkLst:
                 self.topkLst[element] = 1
+            else:
+                self.topkLst[element] += 1
+        elif element in self.topkLst:
+            self.topkLst[element] += 1
         else:
             tmpLst = copy.deepcopy(self.topkLst)
             for key in tmpLst:
@@ -118,8 +122,8 @@ class heavyHitter(object):
         # select d hash functions
         delta = 0.01           # delta confidence
         d = math.ceil(math.log(1.0/delta))       # hash function number d
-        print ("d: ", d)
-        epsilon = 0.1
+        #print ("d: ", d)
+        epsilon = 0.001                           #epsilon
         w = math.ceil(math.e/epsilon)
         sketchTable = [[0]*w for i in range(d)]
         
@@ -131,7 +135,7 @@ class heavyHitter(object):
         return min(table[i] for table, i in zip(sketchTable, self._hash(element, d, w)))
     
             
-    def frequentItemCountMinSketch(self, element, m, k):
+    def frequentItemCountMinSketch(self, element, k):
         '''
         element: hashtag
         find frequent item, occuring at least m/k times  ;   count-min sketch algorithm
@@ -147,7 +151,7 @@ class heavyHitter(object):
         if len(self.hp) < k-1:            # > m/k  not m >=k
             #push into heap
             heapq.heappush(hp, (element, freq))
-        elif freq > m/k:
+        elif freq > self.m/k:
             #check current element is in the heap or not
             flag = False      # flag for in the heap or not 
             for e in self.hp:
@@ -191,7 +195,7 @@ class heavyHitter(object):
                 
         with open(outFile, "a") as fd:
             #write into file
-            self.writeListRowToFileWriterTsv(fd, ["hashtag",  "frequency"], "\t")
+            self.writeListRowToFileWriterTsv(fd, ["top frequent hashtag",  "Last frequency"], "\t")
 
             for k, v in self.topkLst.items():
                 self.writeListRowToFileWriterTsv(fd, [k, v], "\t")
