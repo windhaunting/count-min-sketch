@@ -1,7 +1,4 @@
-
-
-codes about no sketch algorithm and heavy hitter algorithm for tweet data stream
-
+Codes about no sketch algorithm and heavy hitter algorithm for tweet data stream
 
 executeFrequentItem function implements the first non-sketching frequent item algorithm.
 executeHeavyHitter function implements the count-min sketch and heavy hitter algorithm
